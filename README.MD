@@ -171,9 +171,6 @@ LOCAL_LLM_URL=http://localhost:11434/api/generate
 # Google Gemini (requires pip install -e ".[google]")
 GEMINI_API_KEY=your_key_here
 ```
-
-The `.env` file is gitignored — it will never be committed.
-
 ---
 
 ## Usage
