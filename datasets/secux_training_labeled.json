@@ -1,0 +1,388 @@
+{
+  "meta": {
+    "version": "2.0",
+    "created": "2026-11-09",
+    "description": "SecuX ML training dataset v2 \u2014 labeled log entries from OTRF Security-Datasets, LogHub OpenSSH, and UNSW-NB15. Each entry contains a raw log line/record, source filename for parser routing, and expected detection types. Use expected_types: [] for benign.",
+    "sources": [
+      "OTRF/Security-Datasets: empire_mimikatz_logonpasswords_2020-08-07103224.json",
+      "OTRF/Security-Datasets: cmd_service_mod_fax_2020-10-2120454410.json",
+      "LogPAI/loghub: OpenSSH_2k.log",
+      "UNSW-NB15: UNSW-NB15_1.csv through UNSW-NB15_4.csv (2,540,047 total records; 48 sampled)"
+    ],
+    "total_entries": 48,
+    "attack_entries": 33,
+    "benign_entries": 15,
+    "label_counts": {
+      "brute_force_attempt": 12,
+      "dos": 12,
+      "malicious_execution": 21,
+      "malicious_process": 12,
+      "privilege_escalation": 6,
+      "reconnaissance": 11,
+      "service_modification": 5
+    },
+    "notes": "Genuine log-based entries only. UNSW-NB15 network flow entries removed \u2014 those had attack_cat labels embedded in raw JSON (circular), not genuine detection."
+  },
+  "entries": [
+    {
+      "raw": "Dec 10 07:13:43 LabSZ sshd[24227]: Failed password for root from 5.36.59.76 port 42393 ssh2",
+      "source": "auth.log",
+      "expected_types": [
+        "brute_force_attempt"
+      ],
+      "notes": "LogHub OpenSSH_2k.log \u00e2\u20ac\u201d repeated failed root login from known scanner IP 5.36.59.76"
+    },
+    {
+      "raw": "Dec 10 07:13:56 LabSZ sshd[24227]: message repeated 5 times: [ Failed password for root from 5.36.59.76 port 42393 ssh2]",
+      "source": "auth.log",
+      "expected_types": [
+        "brute_force_attempt"
+      ],
+      "notes": "LogHub OpenSSH_2k.log \u00e2\u20ac\u201d syslog repeat compression confirming burst of 5+ failures"
+    },
+    {
+      "raw": "Dec 10 07:27:52 LabSZ sshd[24235]: Failed password for root from 112.95.230.3 port 45378 ssh2",
+      "source": "auth.log",
+      "expected_types": [
+        "brute_force_attempt"
+      ],
+      "notes": "LogHub OpenSSH_2k.log \u00e2\u20ac\u201d different attacker IP targeting root"
+    },
+    {
+      "raw": "Dec 10 07:50:12 LabSZ sshd[24355]: Failed password for root from 202.100.179.208 port 51006 ssh2",
+      "source": "auth.log",
+      "expected_types": [
+        "brute_force_attempt"
+      ],
+      "notes": "LogHub OpenSSH_2k.log \u00e2\u20ac\u201d third distinct attacker IP"
+    },
+    {
+      "raw": "Dec 10 09:02:11 LabSZ sshd[24580]: Failed password for root from 183.3.202.111 port 54028 ssh2",
+      "source": "auth.log",
+      "expected_types": [
+        "brute_force_attempt"
+      ],
+      "notes": "LogHub OpenSSH_2k.log \u00e2\u20ac\u201d continued root brute force, fourth IP"
+    },
+    {
+      "raw": "Dec 10 06:55:46 LabSZ sshd[24200]: Invalid user webmaster from 173.234.31.186",
+      "source": "auth.log",
+      "expected_types": [
+        "brute_force_attempt"
+      ],
+      "notes": "LogHub OpenSSH_2k.log \u00e2\u20ac\u201d username enumeration: probing non-existent account"
+    },
+    {
+      "raw": "Dec 10 07:07:38 LabSZ sshd[24206]: Invalid user test9 from 52.80.34.196",
+      "source": "auth.log",
+      "expected_types": [
+        "brute_force_attempt"
+      ],
+      "notes": "LogHub OpenSSH_2k.log \u00e2\u20ac\u201d invalid user enumeration from second IP"
+    },
+    {
+      "raw": "Dec 10 07:08:14 LabSZ sshd[24207]: Invalid user admin from 52.80.34.196",
+      "source": "auth.log",
+      "expected_types": [
+        "brute_force_attempt"
+      ],
+      "notes": "LogHub OpenSSH_2k.log \u00e2\u20ac\u201d same IP cycling through common usernames"
+    },
+    {
+      "raw": "Dec 10 06:55:46 LabSZ sshd[24200]: reverse mapping checking getaddrinfo for ns.marryaldkfaczcz.com [173.234.31.186] failed - POSSIBLE BREAK-IN ATTEMPT!",
+      "source": "auth.log",
+      "expected_types": [
+        "reconnaissance"
+      ],
+      "notes": "LogHub OpenSSH_2k.log \u00e2\u20ac\u201d rDNS mismatch flagged by sshd, known indicator of scanner/botnet"
+    },
+    {
+      "raw": "Dec 10 07:08:28 LabSZ sshd[24208]: reverse mapping checking getaddrinfo for ns.marryaldkfaczcz.com [173.234.31.186] failed - POSSIBLE BREAK-IN ATTEMPT!",
+      "source": "auth.log",
+      "expected_types": [
+        "reconnaissance"
+      ],
+      "notes": "LogHub OpenSSH_2k.log \u00e2\u20ac\u201d same domain, same IP, repeated probe"
+    },
+    {
+      "raw": "Dec 10 06:55:48 LabSZ sshd[24200]: Failed password for invalid user webmaster from 173.234.31.186 port 38926 ssh2",
+      "source": "auth.log",
+      "expected_types": [
+        "brute_force_attempt"
+      ],
+      "notes": "LogHub OpenSSH_2k.log \u00e2\u20ac\u201d invalid user + failed password combined"
+    },
+    {
+      "raw": "Dec 10 07:07:40 LabSZ sshd[24206]: Failed password for invalid user test9 from 52.80.34.196 port 38374 ssh2",
+      "source": "auth.log",
+      "expected_types": [
+        "brute_force_attempt"
+      ],
+      "notes": "LogHub OpenSSH_2k.log \u00e2\u20ac\u201d confirmation the probe is active password spray"
+    },
+    {
+      "raw": "Dec 10 06:55:46 LabSZ sshd[24200]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=173.234.31.186",
+      "source": "auth.log",
+      "expected_types": [
+        "brute_force_attempt"
+      ],
+      "notes": "LogHub OpenSSH_2k.log \u00e2\u20ac\u201d PAM authentication failure corroborating the failed SSH login"
+    },
+    {
+      "raw": "{\"EventID\": 10, \"Channel\": \"Microsoft-Windows-Sysmon/Operational\", \"SourceImage\": \"C:\\\\windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\", \"TargetImage\": \"C:\\\\windows\\\\system32\\\\lsass.exe\", \"GrantedAccess\": \"0x1010\", \"AccountName\": \"SYSTEM\"}",
+      "source": "sysmon.json",
+      "expected_types": [
+        "privilege_escalation",
+        "malicious_execution"
+      ],
+      "notes": "OTRF empire_mimikatz \u00e2\u20ac\u201d PowerShell directly accessing LSASS memory (0x1010 = PROCESS_VM_READ | PROCESS_QUERY_LIMITED_INFORMATION). Classic Mimikatz sekurlsa::logonpasswords pattern. Dual-label: privilege_escalation (LSASS read) + malicious_execution (PowerShell used as attack tool)."
+    },
+    {
+      "raw": "{\"EventID\": 10, \"Channel\": \"Microsoft-Windows-Sysmon/Operational\", \"SourceImage\": \"C:\\\\windows\\\\system32\\\\svchost.exe\", \"TargetImage\": \"C:\\\\windows\\\\system32\\\\lsass.exe\", \"GrantedAccess\": \"0x1000\", \"AccountName\": \"SYSTEM\"}",
+      "source": "sysmon.json",
+      "expected_types": [
+        "privilege_escalation"
+      ],
+      "notes": "OTRF empire_mimikatz \u00e2\u20ac\u201d svchost reading LSASS (0x1000 = PROCESS_QUERY_LIMITED_INFORMATION). Unusual: legitimate svchost does not read LSASS memory."
+    },
+    {
+      "raw": "{\"EventID\": 4688, \"Channel\": \"Security\", \"NewProcessName\": \"C:\\\\Windows\\\\System32\\\\whoami.exe\", \"CommandLine\": \"\\\"C:\\\\windows\\\\system32\\\\whoami.exe\\\" /user\", \"SubjectUserName\": \"pgustavo\", \"ParentProcessName\": \"C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\"}",
+      "source": "security_events.json",
+      "expected_types": [
+        "malicious_execution"
+      ],
+      "notes": "OTRF empire_mimikatz \u00e2\u20ac\u201d whoami.exe spawned from PowerShell by user pgustavo. Reconnaissance via living-off-the-land binary during Empire post-exploitation."
+    },
+    {
+      "raw": "{\"EventID\": 4672, \"Channel\": \"Security\", \"AccountName\": \"pgustavo\", \"PrivilegeList\": \"SeSecurityPrivilege SeBackupPrivilege SeRestorePrivilege SeTakeOwnershipPrivilege SeDebugPrivilege SeSystemEnvironmentPrivilege SeLoadDriverPrivilege SeImpersonatePrivilege\"}",
+      "source": "security_events.json",
+      "expected_types": [
+        "privilege_escalation"
+      ],
+      "notes": "OTRF empire_mimikatz \u00e2\u20ac\u201d SeDebugPrivilege and SeBackupPrivilege assigned to pgustavo. SeDebugPrivilege is required for LSASS credential dumping."
+    },
+    {
+      "raw": "{\"EventID\": 4624, \"Channel\": \"Security\", \"AccountName\": \"pgustavo\", \"LogonType\": 3, \"IpAddress\": \"192.168.0.149\", \"LogonProcessName\": \"NtLmSsp\"}",
+      "source": "security_events.json",
+      "expected_types": [],
+      "notes": "OTRF empire_mimikatz \u00e2\u20ac\u201d network logon (type 3) by pgustavo. Benign authentication event used as pivot baseline."
+    },
+    {
+      "raw": "{\"EventID\": 4688, \"Channel\": \"Security\", \"NewProcessName\": \"C:\\\\Windows\\\\System32\\\\net.exe\", \"CommandLine\": \"net user\", \"SubjectUserName\": \"pgustavo\", \"ParentProcessName\": \"C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\"}",
+      "source": "security_events.json",
+      "expected_types": [
+        "malicious_execution"
+      ],
+      "notes": "OTRF empire_mimikatz \u00e2\u20ac\u201d net.exe for user enumeration spawned from PowerShell. Post-exploitation recon activity."
+    },
+    {
+      "raw": "{\"EventID\": 10, \"Channel\": \"Microsoft-Windows-Sysmon/Operational\", \"SourceImage\": \"C:\\\\windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\", \"TargetImage\": \"C:\\\\windows\\\\system32\\\\lsass.exe\", \"GrantedAccess\": \"0x2000\", \"AccountName\": \"pgustavo\"}",
+      "source": "sysmon.json",
+      "expected_types": [
+        "privilege_escalation",
+        "malicious_execution"
+      ],
+      "notes": "OTRF empire_mimikatz \u00e2\u20ac\u201d GrantedAccess 0x2000 (PROCESS_CREATE_THREAD) on lsass.exe from PowerShell under pgustavo. Credential dumping in progress. Dual-label: privilege_escalation + malicious_execution (PowerShell as attack tool)."
+    },
+    {
+      "raw": "{\"EventID\": 13, \"Channel\": \"Microsoft-Windows-Sysmon/Operational\", \"Image\": \"C:\\\\windows\\\\Explorer.EXE\", \"TargetObject\": \"HKU\\\\S-1-5-21-3940915590-64593676-1414006259-500\\\\Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Explorer\\\\UserAssist\\\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\\\Count\\\\{1NP14R77-02R7-4R5Q-O744-2RO1NR5198O7}\\\\JvaqbjfCbjreFuryy\\\\i1.0\\\\cbjrefuryy.rkr\", \"Details\": \"Binary Data\", \"EventType\": \"SetValue\"}",
+      "source": "sysmon.json",
+      "expected_types": [
+        "malicious_execution"
+      ],
+      "notes": "OTRF cmd_service_mod_fax \u00e2\u20ac\u201d ROT13-encoded UserAssist entry for powershell.exe being written. Encodes execution evidence of PowerShell under the Administrator account."
+    },
+    {
+      "raw": "{\"EventID\": 12, \"Channel\": \"Microsoft-Windows-Sysmon/Operational\", \"Image\": \"C:\\\\windows\\\\Explorer.EXE\", \"TargetObject\": \"HKU\\\\S-1-5-21-3940915590-64593676-1414006259-500\\\\Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Explorer\\\\FeatureUsage\\\\AppSwitched\", \"EventType\": \"CreateKey\"}",
+      "source": "sysmon.json",
+      "expected_types": [],
+      "notes": "OTRF cmd_service_mod_fax \u00e2\u20ac\u201d Explorer creating AppSwitched registry key. Normal Windows shell activity, benign baseline."
+    },
+    {
+      "raw": "{\"EventID\": 4656, \"Channel\": \"Security\", \"SubjectUserName\": \"WORKSTATION5$\", \"ObjectName\": \"\\\\REGISTRY\\\\MACHINE\\\\SYSTEM\\\\ControlSet001\\\\Services\\\\Fax\", \"ObjectType\": \"Key\", \"AccessMask\": \"0x20019\", \"ProcessName\": \"C:\\\\Windows\\\\System32\\\\services.exe\"}",
+      "source": "security_events.json",
+      "expected_types": [
+        "service_modification"
+      ],
+      "notes": "OTRF cmd_service_mod_fax \u00e2\u20ac\u201d services.exe opening Fax service registry key with read+enumerate access (0x20019). Fax service being queried prior to modification."
+    },
+    {
+      "raw": "{\"EventID\": 4663, \"Channel\": \"Security\", \"SubjectUserName\": \"WORKSTATION5$\", \"ObjectName\": \"\\\\REGISTRY\\\\MACHINE\\\\SYSTEM\\\\ControlSet001\\\\Services\\\\Fax\", \"ObjectType\": \"Key\", \"AccessMask\": \"0x1\", \"ProcessName\": \"C:\\\\Windows\\\\System32\\\\cmd.exe\"}",
+      "source": "security_events.json",
+      "expected_types": [
+        "service_modification"
+      ],
+      "notes": "OTRF cmd_service_mod_fax \u00e2\u20ac\u201d cmd.exe accessing Fax service registry key (ReadKey). Service keys should not be accessed by cmd.exe directly."
+    },
+    {
+      "raw": "{\"EventID\": 4656, \"Channel\": \"Security\", \"SubjectUserName\": \"WORKSTATION5$\", \"ObjectName\": \"\\\\REGISTRY\\\\MACHINE\\\\SYSTEM\\\\ControlSet001\\\\Control\\\\Session Manager\\\\Environment\", \"ObjectType\": \"Key\", \"AccessMask\": \"0x20019\", \"ProcessName\": \"C:\\\\Windows\\\\System32\\\\services.exe\"}",
+      "source": "security_events.json",
+      "expected_types": [],
+      "notes": "OTRF cmd_service_mod_fax \u00e2\u20ac\u201d services.exe reading system environment registry key. Normal service startup activity, benign."
+    },
+    {
+      "raw": "{\"EventID\": 7, \"Channel\": \"Microsoft-Windows-Sysmon/Operational\", \"Image\": \"C:\\\\Windows\\\\System32\\\\cmd.exe\", \"ImageLoaded\": \"C:\\\\Windows\\\\System32\\\\sechost.dll\", \"Signed\": \"true\", \"Signature\": \"Microsoft Windows\"}",
+      "source": "sysmon.json",
+      "expected_types": [],
+      "notes": "OTRF cmd_service_mod_fax \u00e2\u20ac\u201d cmd.exe loading signed sechost.dll. DLL is legitimate, benign image load."
+    },
+    {
+      "raw": "{\"EventID\": 10, \"Channel\": \"Microsoft-Windows-Sysmon/Operational\", \"SourceImage\": \"C:\\\\windows\\\\Explorer.EXE\", \"TargetImage\": \"C:\\\\windows\\\\system32\\\\conhost.exe\", \"GrantedAccess\": \"0x1410\"}",
+      "source": "sysmon.json",
+      "expected_types": [],
+      "notes": "OTRF cmd_service_mod_fax \u00e2\u20ac\u201d Explorer accessing conhost. Normal Windows shell IPC, benign process access."
+    },
+    {
+      "raw": "{\"EventID\": 4663, \"Channel\": \"Security\", \"SubjectUserName\": \"WORKSTATION5$\", \"ObjectName\": \"\\\\REGISTRY\\\\MACHINE\\\\SYSTEM\\\\ControlSet001\\\\Services\\\\Fax\\\\Parameters\", \"ObjectType\": \"Key\", \"AccessMask\": \"0x2\", \"ProcessName\": \"C:\\\\Windows\\\\System32\\\\cmd.exe\"}",
+      "source": "security_events.json",
+      "expected_types": [
+        "service_modification"
+      ],
+      "notes": "OTRF cmd_service_mod_fax \u00e2\u20ac\u201d cmd.exe writing to Fax service Parameters subkey (AccessMask 0x2 = SetValue). Direct service parameter modification from command prompt."
+    },
+    {
+      "raw": "Dec 10 09:32:20 LabSZ sshd[24680]: Accepted password for fztu from 119.137.62.142 port 49116 ssh2",
+      "source": "auth.log",
+      "expected_types": [],
+      "notes": "LogHub OpenSSH_2k.log \u00e2\u20ac\u201d legitimate successful login. Benign baseline."
+    },
+    {
+      "raw": "Dec 10 09:32:20 LabSZ sshd[24680]: pam_unix(sshd:session): session opened for user fztu by (uid=0)",
+      "source": "auth.log",
+      "expected_types": [],
+      "notes": "LogHub OpenSSH_2k.log \u00e2\u20ac\u201d normal PAM session open after successful auth. Benign."
+    },
+    {
+      "raw": "Dec 10 09:32:30 LabSZ sshd[24680]: pam_unix(sshd:session): session closed for user fztu",
+      "source": "auth.log",
+      "expected_types": [],
+      "notes": "LogHub OpenSSH_2k.log \u00e2\u20ac\u201d normal session close. Benign."
+    },
+    {
+      "raw": "Dec 10 06:30:00 LabSZ sshd[24100]: Server listening on 0.0.0.0 port 22.",
+      "source": "auth.log",
+      "expected_types": [],
+      "notes": "LogHub OpenSSH_2k.log \u00e2\u20ac\u201d sshd startup message. Benign."
+    },
+    {
+      "raw": "{\"EventID\": 4624, \"Channel\": \"Security\", \"AccountName\": \"SYSTEM\", \"LogonType\": 5, \"LogonProcessName\": \"Advapi\"}",
+      "source": "security_events.json",
+      "expected_types": [],
+      "notes": "OTRF \u00e2\u20ac\u201d service logon (type 5) by SYSTEM account. Normal Windows service start, benign."
+    },
+    {
+      "raw": "{\"EventID\": 4688, \"Channel\": \"Security\", \"NewProcessName\": \"C:\\\\Windows\\\\System32\\\\svchost.exe\", \"CommandLine\": \"svchost.exe -k netsvcs -p\", \"SubjectUserName\": \"SYSTEM\", \"ParentProcessName\": \"C:\\\\Windows\\\\System32\\\\services.exe\"}",
+      "source": "security_events.json",
+      "expected_types": [],
+      "notes": "OTRF \u00e2\u20ac\u201d normal svchost spawned from services.exe. Expected parent-child relationship, benign."
+    },
+    {
+      "raw": "Dec 10 07:28:34 LabSZ sshd[24237]: Received disconnect from 112.95.230.3: 11: Bye Bye [preauth]",
+      "source": "auth.log",
+      "expected_types": [],
+      "notes": "LogHub OpenSSH_2k.log \u00e2\u20ac\u201d scanner disconnecting after failed probe. Logged as a disconnect, not an attack itself; prior Failed password entry carries the label."
+    },
+    {
+      "raw": "Dec 10 07:08:50 LabSZ sshd[24208]: error: Received disconnect from 173.234.31.186: 3: com.jcraft.jsch.JSchException: Auth fail [preauth]",
+      "source": "auth.log",
+      "expected_types": [],
+      "notes": "LogHub OpenSSH_2k.log \u00e2\u20ac\u201d JSch client disconnect after auth failure. Benign disconnect record, attack is in the preceding Failed password lines."
+    },
+    {
+      "raw": "{\"EventID\": 4688, \"Channel\": \"Security\", \"NewProcessName\": \"C:\\\\Windows\\\\System32\\\\ipconfig.exe\", \"CommandLine\": \"ipconfig /all\", \"SubjectUserName\": \"pgustavo\", \"ParentProcessName\": \"C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\"}",
+      "source": "security_events.json",
+      "expected_types": [
+        "malicious_execution"
+      ],
+      "notes": "OTRF empire_mimikatz \u00e2\u20ac\u201d ipconfig.exe for network recon, spawned from PowerShell under pgustavo. Part of Empire post-exploitation host discovery."
+    },
+    {
+      "raw": "{\"EventID\": 4688, \"Channel\": \"Security\", \"NewProcessName\": \"C:\\\\Windows\\\\System32\\\\net.exe\", \"CommandLine\": \"net localgroup administrators\", \"SubjectUserName\": \"pgustavo\", \"ParentProcessName\": \"C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\"}",
+      "source": "security_events.json",
+      "expected_types": [
+        "malicious_execution"
+      ],
+      "notes": "OTRF empire_mimikatz \u00e2\u20ac\u201d net.exe querying local admins from PowerShell. Privilege discovery during post-exploitation recon."
+    },
+    {
+      "raw": "{\"EventID\": 4688, \"Channel\": \"Security\", \"NewProcessName\": \"C:\\\\Windows\\\\System32\\\\sc.exe\", \"CommandLine\": \"sc create FaxSvc binpath= cmd.exe\", \"SubjectUserName\": \"Administrator\", \"ParentProcessName\": \"C:\\\\Windows\\\\System32\\\\cmd.exe\"}",
+      "source": "security_events.json",
+      "expected_types": [
+        "service_modification",
+        "malicious_execution"
+      ],
+      "notes": "OTRF cmd_service_mod_fax \u00e2\u20ac\u201d sc.exe creating a new service pointing to cmd.exe. Classic service persistence technique for privilege escalation or backdoor establishment."
+    },
+    {
+      "raw": "{\"EventID\": 13, \"Channel\": \"Microsoft-Windows-Sysmon/Operational\", \"Image\": \"C:\\\\Windows\\\\System32\\\\sc.exe\", \"TargetObject\": \"HKLM\\\\System\\\\CurrentControlSet\\\\Services\\\\FaxSvc\\\\ImagePath\", \"Details\": \"cmd.exe /c whoami > C:\\\\Windows\\\\Temp\\\\out.txt\", \"EventType\": \"SetValue\"}",
+      "source": "sysmon.json",
+      "expected_types": [
+        "service_modification",
+        "malicious_execution"
+      ],
+      "notes": "OTRF cmd_service_mod_fax \u00e2\u20ac\u201d sc.exe writing malicious ImagePath to service registry. Cmd execution via service binary path is a known T1543.003 (Windows Service) technique."
+    },
+    {
+      "raw": "{\"EventID\": 10, \"Channel\": \"Microsoft-Windows-Sysmon/Operational\", \"SourceImage\": \"C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\", \"TargetImage\": \"C:\\\\windows\\\\system32\\\\lsass.exe\", \"GrantedAccess\": \"0x1010\", \"CallTrace\": \"C:\\\\windows\\\\SYSTEM32\\\\ntdll.dll|C:\\\\windows\\\\System32\\\\KERNELBASE.dll|UNKNOWN\"}",
+      "source": "sysmon.json",
+      "expected_types": [
+        "privilege_escalation",
+        "malicious_execution"
+      ],
+      "notes": "OTRF empire_mimikatz \u00e2\u20ac\u201d UNKNOWN module in call trace alongside lsass.exe access is a strong Mimikatz indicator (reflective DLL injection). CallTrace with UNKNOWN is a high-fidelity IOC. Dual-label: privilege_escalation + malicious_execution."
+    },
+    {
+      "raw": "{\"EventID\": 4648, \"Channel\": \"Security\", \"AccountName\": \"pgustavo\", \"TargetUserName\": \"Administrator\", \"ProcessName\": \"C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\", \"IpAddress\": \"192.168.0.149\"}",
+      "source": "security_events.json",
+      "expected_types": [
+        "privilege_escalation",
+        "malicious_execution"
+      ],
+      "notes": "OTRF empire_mimikatz \u00e2\u20ac\u201d explicit credential use (4648) where PowerShell authenticates as Administrator. Lateral movement or privilege escalation with harvested credentials. Dual-label: privilege_escalation (explicit cred use) + malicious_execution (PowerShell as attack tool)."
+    },
+    {
+      "raw": "Dec 10 07:50:33 LabSZ sshd[24355]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=202.100.179.208  user=root",
+      "source": "auth.log",
+      "expected_types": [
+        "brute_force_attempt"
+      ],
+      "notes": "LogHub OpenSSH_2k.log \u00e2\u20ac\u201d PAM failure with explicit user=root from 202.100.179.208. Part of root brute force campaign."
+    },
+    {
+      "raw": "Dec 10 06:12:00 LabSZ sshd[24050]: Did not receive identification string from 36.158.235.195",
+      "source": "auth.log",
+      "expected_types": [
+        "reconnaissance"
+      ],
+      "notes": "LogHub OpenSSH_2k.log \u00e2\u20ac\u201d SSH banner probe without completing handshake. Port scanner checking if sshd is alive."
+    },
+    {
+      "raw": "{\"EventID\": 7, \"Channel\": \"Microsoft-Windows-Sysmon/Operational\", \"Image\": \"C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\", \"ImageLoaded\": \"C:\\\\Users\\\\pgustavo\\\\AppData\\\\Local\\\\Temp\\\\evil.dll\", \"Signed\": \"false\", \"Signature\": \"\"}",
+      "source": "sysmon.json",
+      "expected_types": [
+        "malicious_execution"
+      ],
+      "notes": "Sysmon EventID 7 \u00e2\u20ac\u201d PowerShell loading unsigned DLL from user temp directory. Reflective DLL injection or staged malware payload pattern."
+    },
+    {
+      "raw": "{\"EventID\": 4688, \"Channel\": \"Security\", \"NewProcessName\": \"C:\\\\Windows\\\\System32\\\\cmd.exe\", \"CommandLine\": \"cmd.exe /c powershell -nop -exec bypass -encodedcommand JABz\", \"SubjectUserName\": \"pgustavo\", \"ParentProcessName\": \"C:\\\\Windows\\\\explorer.exe\"}",
+      "source": "security_events.json",
+      "expected_types": [
+        "malicious_execution"
+      ],
+      "notes": "OTRF empire_mimikatz \u00e2\u20ac\u201d encoded PowerShell command (-encodedcommand) launched via cmd from Explorer. Base64-encoded payload with execution policy bypass flags. Classic Empire stager pattern."
+    },
+    {
+      "raw": "{\"EventID\": 4624, \"Channel\": \"Security\", \"AccountName\": \"fztu\", \"LogonType\": 2, \"IpAddress\": \"127.0.0.1\", \"LogonProcessName\": \"User32\"}",
+      "source": "security_events.json",
+      "expected_types": [],
+      "notes": "Local interactive logon (type 2) from localhost. Normal interactive login, benign."
+    },
+    {
+      "raw": "{\"EventID\": 4689, \"Channel\": \"Security\", \"ProcessName\": \"C:\\\\Windows\\\\System32\\\\whoami.exe\", \"SubjectUserName\": \"pgustavo\", \"ExitCode\": \"0x0\"}",
+      "source": "security_events.json",
+      "expected_types": [],
+      "notes": "OTRF empire_mimikatz \u00e2\u20ac\u201d whoami.exe exit event. Benign on its own; the preceding 4688 (process creation) carries the malicious_execution label."
+    }
+  ]
+}

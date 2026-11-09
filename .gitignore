@@ -1,8 +1,8 @@
-# Secrets
+# ── Secrets ───────────────────────────────────────────────────────────────────
 .env
 *.env
 
-# Python
+# ── Python ────────────────────────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
 *.pyo
@@ -15,26 +15,63 @@ build/
 *.egg
 .eggs/
 
-# Virtual environments
+# ── Virtual environments ───────────────────────────────────────────────────────
 venv/
 env/
 .venv/
 
-# Testing
+# ── Testing ───────────────────────────────────────────────────────────────────
 .pytest_cache/
 .coverage
 htmlcov/
 
-# IDE
+# ── IDE ───────────────────────────────────────────────────────────────────────
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# OS
+# ── OS ────────────────────────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
 
-# Output files
+# ── Pip packages installed into src/ (use venv instead) ───────────────────────
+# These end up here when someone runs: pip install --target src/
+src/bin/
+src/certifi/
+src/certifi-*/
+src/charset_normalizer/
+src/charset_normalizer-*/
+src/dotenv/
+src/idna/
+src/idna-*/
+src/markdown_it/
+src/markdown_it_py-*/
+src/mdurl/
+src/mdurl-*/
+src/pygments/
+src/pygments-*/
+src/python_dotenv-*/
+src/requests/
+src/requests-*/
+src/rich/
+src/rich-*/
+src/urllib3/
+src/urllib3-*/
+src/watchdog/
+src/watchdog-*/
+
+# ── Datasets — large raw files ─────────────────────────────────────────────────
+# UNSW-NB15 CSVs (94MB–162MB each), OpenSSH log, OTRF Mimikatz JSON (42MB)
+# Download instructions in docs/DATASETS.md
+datasets/*.csv
+datasets/*.log
+datasets/empire_mimikatz_*.json
+datasets/cmd_service_mod_*.json
+# Keep the small hand-labeled eval set (24KB)
+!datasets/secux_training_labeled.json
+
+# ── Generated JSON output ──────────────────────────────────────────────────────
 *.json
 !tests/**/*.json
+!datasets/secux_training_labeled.json

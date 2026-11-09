@@ -38,9 +38,9 @@ class JSONLogParser(BaseParser):
             data = json.loads(content)
             if isinstance(data, list):
                 for item in data:
-                    yield from self._parse_dict(item, content[:200])
+                    yield from self._parse_dict(item, content)
             else:
-                yield from self._parse_dict(data, content[:200])
+                yield from self._parse_dict(data, content)
         except json.JSONDecodeError:
             return
     
