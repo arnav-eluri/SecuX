@@ -191,7 +191,7 @@ class TestAnomalyDetector:
         
         anomalies = detector.analyze(entries)
         
-        off_hours = [a for a in anomalies if a.type == "off_hours_activity"]
+        off_hours = [a for a in anomalies if a.type == "off_hours_login"]
         assert len(off_hours) > 0
     
     def test_detect_privilege_escalation(self):

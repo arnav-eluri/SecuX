@@ -6,7 +6,7 @@ from .base import BaseParser, LogEntry
 
 
 SYSLOG_REGEX = re.compile(
-    r'^<(?P<priority>\d+)>?(?P<timestamp>\w{3}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2})\s+'
+    r'^(?:<(?P<priority>\d+)>)?(?P<timestamp>\w{3}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2})\s+'
     r'(?P<hostname>\S+)\s+(?P<tag>\S+?)(?:\[(?P<pid>\d+)\])?:\s+(?P<message>.*)$'
 )
 
@@ -35,7 +35,19 @@ class SyslogParser(BaseParser):
     
     def can_parse(self, filepath: str) -> bool:
         name = filepath.lower()
-        return any(x in name for x in ['syslog', 'auth.log', 'secure', 'messages', 'kern.log'])
+        if any(x in name for x in ['syslog', 'auth.log', 'secure', 'messages', 'kern.log']):
+            return True
+        # Accept any .log file whose first non-comment line looks like syslog/RFC3164
+        if name.endswith('.log'):
+            try:
+                with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+                    for line in f:
+                        line = line.strip()
+                        if line and not line.startswith('#'):
+                            return bool(SYSLOG_REGEX.match(line))
+            except Exception:
+                pass
+        return False
     
     def parse(self, filepath: str) -> Iterator[LogEntry]:
         if not os.path.exists(filepath):

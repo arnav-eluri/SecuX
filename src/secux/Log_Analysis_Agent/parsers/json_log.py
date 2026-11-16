@@ -76,8 +76,8 @@ class JSONLogParser(BaseParser):
                 value = data[field]
                 if isinstance(value, (int, float)):
                     if value > 1e10:
-                        return datetime.fromtimestamp(value / 1000)
-                    return datetime.fromtimestamp(value)
+                        return datetime.fromtimestamp(value / 1000, tz=timezone.utc)
+                    return datetime.fromtimestamp(value, tz=timezone.utc)
                 elif isinstance(value, str):
                     try:
                         if 'T' in value:

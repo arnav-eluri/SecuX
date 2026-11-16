@@ -1,6 +1,6 @@
 import re
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Iterator, Optional
 from .base import BaseParser, LogEntry
 
@@ -37,7 +37,7 @@ class SimpleTextParser(BaseParser):
                         try:
                             timestamp = datetime.strptime(groups['timestamp'], '%Y-%m-%d %H:%M:%S')
                         except Exception:
-                            timestamp = datetime.utcnow()
+                            timestamp = datetime.now(timezone.utc)
 
                         msg = groups['message']
                         level = groups['level']
@@ -125,7 +125,7 @@ class SimpleTextParser(BaseParser):
                     else:
                         # Fallback for non-matching lines (treat as info)
                         yield LogEntry(
-                            timestamp=datetime.utcnow(),
+                            timestamp=datetime.now(timezone.utc),
                             source=os.path.basename(filepath),
                             event_type="unknown",
                             level="Information",

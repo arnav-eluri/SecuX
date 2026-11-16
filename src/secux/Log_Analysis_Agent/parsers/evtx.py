@@ -1,6 +1,6 @@
 import os
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Iterator, Optional
 from .base import BaseParser, LogEntry
 
@@ -81,7 +81,7 @@ class EVTXParser(BaseParser):
             if timestamp_str:
                 timestamp = datetime.fromisoformat(timestamp_str.replace('Z', '+00:00'))
             else:
-                timestamp = datetime.utcnow()
+                timestamp = datetime.now(timezone.utc)
             
             level_elem = system.find('ns:Level', ns) if system is not None else None
             level = self._map_level(int(level_elem.text)) if level_elem is not None else "Information"
