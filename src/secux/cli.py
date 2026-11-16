@@ -5,8 +5,6 @@ import sys
 from pathlib import Path
 from datetime import datetime, timezone
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
 from secux.Log_Analysis_Agent import LogAnalysisAgent
 from secux.Authentication_Agent import AuthenticationAgent
 from secux.Network_Monitoring_Agent import NetworkMonitoringAgent
@@ -387,12 +385,12 @@ def run_full_audit(timeframe: int, severity_threshold: str, paths: list = None):
             "log_analysis": {
                 "total_findings": len(raw_findings),
                 "severity_breakdown": severity_breakdown,
-                "top_findings": top_finding_summaries,
-                "ai_summary_excerpt": (log_ai_summary or "")[:1000], # Increased context
+                "top_findings": top_finding_summaries[:5],
+                "ai_summary": (log_ai_summary or "")[:400],
             },
-            "auth_intelligence": (auth_results or "No significant auth findings")[:3000],
-            "network_patterns": (net_results or "No network data available (non-Windows or collection failed)")[:3000],
-            "vulnerabilities": (vuln_results or "No critical vulnerabilities identified")[:3000],
+            "auth_intelligence": (auth_results or "No significant auth findings")[:600],
+            "network_patterns": (net_results or "No network data available")[:600],
+            "vulnerabilities": (vuln_results or "No critical vulnerabilities identified")[:600],
         }
 
         final_report = super_agent.analyze(str(summary_context))

@@ -9,21 +9,13 @@ class SuperAgent:
     - Vulnerability Analysis Agent
     """
     
-    PROMPT_SINGLE_PASS = """
-    You are the SecuX Super Agent and Senior Security Analyst.
-    
-    Task: Correlate all agent findings, identify high-level threat patterns, and convert them into a high-density, raw technical SITREP (Situation Report).
-    
-    Data from Analysts:
-    {data}
-    
-    CRITICAL INSTRUCTIONS:
-    - DO NOT use generic "premade" sounding templates.
-    - If the data indicates no findings, state: "SYSTEM STATUS: NOMINAL. No immediate threat vectors detected."
-    - Be RAW and TECHNICAL. Mention specific IPs, ports, processes, or log file names found in the data.
-    - Use a technical, concise analyst tone.
-    - Format: Use a clean, terminal-styled layout with high-density information.
-    """
+    PROMPT_SINGLE_PASS = """Correlate these multi-agent security findings into a concise technical SITREP.
+Reference specific IPs, ports, users from the data. If no findings: "SYSTEM STATUS: NOMINAL."
+
+Data:
+{data}
+
+Format: THREAT LEVEL | ATTACK CHAIN | IOCs | RECOMMENDED ACTIONS"""
     
     def __init__(self, name: str = "Super_Agent"):
         self.name = name

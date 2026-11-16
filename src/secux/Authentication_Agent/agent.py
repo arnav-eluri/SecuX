@@ -5,33 +5,11 @@ class AuthenticationAgent:
     Analyzes authentication-related activity and detects suspicious login behavior.
     """
     
-    PROMPT = """
-    You are the Authentication Agent in a multi-agent cybersecurity system.
+    PROMPT = """Analyze this auth data for brute-force, credential stuffing, unusual IPs, rapid attempts, post-failure logins.
+Return JSON: [{{"type","severity","confidence","ip","user","description"}}]. No prose.
 
-    Task:
-    Analyze authentication-related activity and detect suspicious login behavior.
-
-    Instructions:
-    - Monitor login attempts, sessions, and credential usage
-    - Detect:
-      • brute-force attacks (multiple failed logins)
-      • credential stuffing patterns
-      • unusual login locations/IPs
-      • rapid login attempts across accounts
-      • successful login after repeated failures
-    - Identify user-specific anomalies
-
-    Assign:
-    - severity: LOW | MEDIUM | HIGH | CRITICAL
-    - confidence: 0.0–1.0
-
-    Data to analyze:
-    {data}
-
-    Output:
-    Return only structured JSON with findings and evidence.
-    No extra explanation.
-    """
+Data:
+{data}"""
     
     def __init__(self, name: str = "Authentication_Agent"):
         self.name = name

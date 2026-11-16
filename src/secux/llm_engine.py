@@ -16,16 +16,14 @@ class LLMEngine:
         
         # OpenRouter setup
         self.openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
-        self.openrouter_model = os.getenv("OPENROUTER_MODEL", "qwen/qwen3-coder:free")
-        
-        # Per-agent model configuration (uses :free variants on OpenRouter)
-        # Verified against live https://openrouter.ai/api/v1/models — update periodically
+        self.openrouter_model = os.getenv("OPENROUTER_MODEL", "qwen/qwen3-7b:free")
+
         self.model_config = {
-            "super_agent":       "qwen/qwen3-coder:free", # State-of-the-art coding and logic
-            "log_analysis":      "qwen/qwen3-coder:free", 
-            "anomaly_detector":  "qwen/qwen3-coder:free",
-            "vuln_analysis":     "qwen/qwen3-coder:free", 
-            "report_generator":  "qwen/qwen3-coder:free"  # High-quality technical output
+            "super_agent":       "qwen/qwen3-7b:free",
+            "log_analysis":      "qwen/qwen3-7b:free",
+            "anomaly_detector":  "qwen/qwen3-7b:free",
+            "vuln_analysis":     "qwen/qwen3-7b:free",
+            "report_generator":  "qwen/qwen3-7b:free",
         }
         
         # Google setup (optional fallback)
@@ -40,26 +38,38 @@ class LLMEngine:
         else:
             self.google_model = None
 
+    # Per-agent output token caps — keeps costs low without truncating useful content
+    MAX_TOKENS = {
+        "super_agent":      700,
+        "log_analysis":     500,
+        "anomaly_detector": 300,
+        "vuln_analysis":    300,
+        "report_generator": 500,
+    }
+    DEFAULT_MAX_TOKENS = 400
+
     def query(self, prompt: str, agent_type: Optional[str] = None) -> str:
+        max_tokens = self.MAX_TOKENS.get(agent_type, self.DEFAULT_MAX_TOKENS)
         res = None
         if self.provider == "local":
-            res = self._query_local(prompt)
+            res = self._query_local(prompt, max_tokens)
         elif self.provider == "google":
-            res = self._query_google(prompt)
+            res = self._query_google(prompt, max_tokens)
         elif self.provider == "openrouter":
-            res = self._query_openrouter(prompt, agent_type)
+            res = self._query_openrouter(prompt, agent_type, max_tokens)
         else:
             res = f"Error: Unknown LLM provider '{self.provider}'"
-        
+
         return res if res is not None else "Error: LLM provider returned None or empty response."
 
-    def _query_local(self, prompt: str) -> Optional[str]:
+    def _query_local(self, prompt: str, max_tokens: int) -> Optional[str]:
         """Query local LLM via Ollama API."""
         try:
             payload = {
                 "model": self.local_model,
                 "prompt": prompt,
-                "stream": False
+                "stream": False,
+                "num_predict": max_tokens,
             }
             response = requests.post(self.local_url, json=payload, timeout=300)
             response.raise_for_status()
@@ -67,18 +77,22 @@ class LLMEngine:
         except Exception as e:
             return f"Error querying local LLM (Ollama): {str(e)}"
 
-    def _query_google(self, prompt: str) -> Optional[str]:
+    def _query_google(self, prompt: str, max_tokens: int) -> Optional[str]:
         """Query Google Gemini API."""
         if not self.google_model:
             return "Error: Gemini model not initialized. Check GEMINI_API_KEY or install google-generativeai."
-        
+
         try:
-            response = self.google_model.generate_content(prompt)
+            import google.generativeai as genai
+            response = self.google_model.generate_content(
+                prompt,
+                generation_config=genai.types.GenerationConfig(max_output_tokens=max_tokens),
+            )
             return response.text
         except Exception as e:
             return f"Error querying Gemini: {str(e)}"
 
-    def _query_openrouter(self, prompt: str, agent_type: Optional[str] = None) -> Optional[str]:
+    def _query_openrouter(self, prompt: str, agent_type: Optional[str] = None, max_tokens: int = 400) -> Optional[str]:
         """Query OpenRouter API with exponential backoff retry on rate limits."""
         if not self.openrouter_api_key:
             return "Error: OPENROUTER_API_KEY not found in environment."
@@ -103,6 +117,7 @@ class LLMEngine:
                     },
                     data=json.dumps({
                         "model": model,
+                        "max_tokens": max_tokens,
                         "messages": [
                             {"role": "user", "content": prompt}
                         ]

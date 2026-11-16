@@ -5,33 +5,11 @@ class NetworkMonitoringAgent:
     Analyzes network activity and detects suspicious traffic patterns.
     """
     
-    PROMPT = """
-    You are the Network Monitoring Agent in a multi-agent cybersecurity system.
+    PROMPT = """Analyze this network data for traffic spikes, repeated IPs, port scanning, blacklisted connections, abnormal frequency.
+Return JSON: [{{"type","severity","confidence","ip","port","description"}}]. No prose.
 
-    Task:
-    Analyze network activity and detect suspicious traffic patterns.
-
-    Instructions:
-    - Monitor incoming/outgoing traffic and connection logs
-    - Detect:
-      • unusual traffic spikes
-      • repeated requests from same IP
-      • unknown or blacklisted IP connections
-      • port scanning behavior
-      • abnormal request frequency
-    - Identify potential reconnaissance or attack patterns
-
-    Assign:
-    - severity: LOW | MEDIUM | HIGH | CRITICAL
-    - confidence: 0.0–1.0
-
-    Data to analyze:
-    {data}
-
-    Output:
-    Return only structured JSON with findings and evidence.
-    No explanations outside JSON.
-    """
+Data:
+{data}"""
     
     def __init__(self, name: str = "Network_Monitoring_Agent"):
         self.name = name

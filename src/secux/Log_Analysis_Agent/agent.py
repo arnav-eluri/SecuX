@@ -14,27 +14,15 @@ from ..llm_engine import LLMEngine
 
 class LogAnalysisAgent:
     
-    PROMPT_SUMMARY = """
-You are a senior cybersecurity analyst reviewing structured threat findings.
-
-You have been given the following log analysis findings from the SecuX detection engine.
-Each finding includes a severity level, a description, and key evidence (IPs, users, timestamps).
+    PROMPT_SUMMARY = """Security analyst. Analyze these findings. Be specific — reference IPs, users, counts.
 
 Findings:
 {findings}
 
-Your task:
-1. Identify the highest-risk threats and explain WHY they are dangerous.
-2. Reference specific IPs, usernames, timestamps, and event counts from the data above.
-3. Group related findings into an attack narrative if applicable (e.g., brute-force → login → privilege escalation = likely account takeover).
-4. Recommend concrete immediate actions (block IP, revoke session, audit user, etc.).
-5. Use a technical analyst tone. Be direct and specific. Do NOT write generic advice.
-
-Format your response as:
-  THREAT SUMMARY
-  IMMEDIATE RISKS (bullet points)
-  RECOMMENDATIONS (numbered)
-"""
+Reply with:
+THREAT SUMMARY (2-3 sentences)
+RISKS (bullets, specific IOCs only)
+ACTIONS (numbered, concrete)"""
     
     def __init__(self, timeframe_hours: int = 24, severity_threshold: str = "LOW"):
         self.timeframe_hours = timeframe_hours
@@ -151,7 +139,7 @@ Format your response as:
             return "No significant findings detected."
             
         finding_context = []
-        for f in findings[:12]:
+        for f in findings[:5]:
             if isinstance(f, dict):
                 sev = f.get('severity', 'N/A')
                 typ = f.get('type', 'N/A')
@@ -168,15 +156,9 @@ Format your response as:
                 conf = f.confidence
 
             ctx = (
-                f"[{sev}] {typ.upper()} | {fid}\n"
-                f"  Description: {desc}\n"
-                f"  Evidence: IP={evid.get('source_ip', 'N/A')}, "
-                f"User={evid.get('target_user', 'N/A')}, "
-                f"Events={evid.get('event_count', 'N/A')}, "
-                f"Confidence={conf:.0%}\n"
-                f"  Time: {evid.get('first_occurrence', 'N/A')} → "
-                f"{evid.get('last_occurrence', 'N/A')}\n"
-                f"  Context: {evid.get('additional_context', '')}"
+                f"[{sev}] {typ} ip={evid.get('source_ip','?')} "
+                f"user={evid.get('target_user','?')} "
+                f"n={evid.get('event_count','?')} conf={conf:.0%} | {desc[:120]}"
             )
             finding_context.append(ctx)
             
