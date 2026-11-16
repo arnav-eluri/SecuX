@@ -119,7 +119,8 @@ def logscan(
     
     if not output:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        output = Path(f"secux_logscan_{timestamp}.json")
+        output = Path("output") / f"secux_logscan_{timestamp}.json"
+    output.parent.mkdir(parents=True, exist_ok=True)
     
     if monitor:
         run_monitoring(

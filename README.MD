@@ -97,7 +97,6 @@ secuxproject/
 │   ├── NUSW-NB15_GT.csv                  # UNSW-NB15 ground truth (321,283 labeled attacks)
 │   └── secux_training_labeled.json       # Hand-labeled evaluation dataset (48 entries)
 ├── docs/
-│   ├── BUGS.md                           # Bug tracking — all 25 bugs resolved
 │   └── DATASETS.md                       # Dataset documentation & format guide
 ├── run.bat                               # Windows one-command setup & launch
 ├── run.sh                                # Bash one-command setup & launch
@@ -187,9 +186,9 @@ Copy `.env.example` to `.env` and set your LLM provider. Scanning works without 
 
 LLM_PROVIDER=openrouter          # local | openrouter | google
 
-# OpenRouter (https://openrouter.ai — free models available)
+# OpenRouter (https://openrouter.ai)
 OPENROUTER_API_KEY=your_key_here
-OPENROUTER_MODEL=meta-llama/llama-3.3-70b-instruct:free
+OPENROUTER_MODEL=qwen/qwen3.7-flash   # ~$0.03/M tokens; check openrouter.ai for free alternatives
 
 # Local Ollama (no API key needed)
 LOCAL_MODEL=llama3.2:3b
@@ -239,7 +238,75 @@ secux logscan --list-logs
 python -m pytest tests/ -v
 ```
 
+### Data Sources
+
+SecuX collects data from two categories: **live system sources** (auto-discovered at runtime) and **log files** (provided via `--paths` or discovered automatically).
+
+#### Live system collection (`audit` mode only)
+
+| Agent | Source | What it collects |
+|:---|:---|:---|
+| Network Monitoring | `netstat -ano` (Windows) | Active connections and listening ports |
+| Vulnerability Analysis | `tasklist` + `platform` module | Running processes, OS version, architecture |
+| Authentication Intelligence | Log findings (filtered) | Auth-related anomalies from the log scan phase |
+
+#### Log file auto-discovery (no `--paths`)
+
+When you run `secux logscan` or `secux audit` without specifying `--paths`, SecuX looks for system logs in the standard locations for your OS:
+
+**Windows**
+| Log name | Path |
+|:---|:---|
+| Security | `C:\Windows\System32\winevt\Logs\Security.evtx` |
+| System | `C:\Windows\System32\winevt\Logs\System.evtx` |
+| Application | `C:\Windows\System32\winevt\Logs\Application.evtx` |
+| Setup | `C:\Windows\System32\winevt\Logs\Setup.evtx` |
+| IIS | `C:\Windows\System32\LogFiles\W3SVC1\` |
+
+> **Windows note:** `.evtx` files require either Administrator privileges or the optional `python-evtx` library (`pip install -e ".[evtx]"`). Without either, the files are found but parse 0 entries. Run PowerShell/CMD as Administrator or point directly at a readable log file with `--paths`.
+
+**Linux**
+| Log name | Path |
+|:---|:---|
+| Auth | `/var/log/auth.log` |
+| Syslog | `/var/log/syslog` |
+| Secure | `/var/log/secure` |
+| Messages | `/var/log/messages` |
+| Apache access | `/var/log/apache2/access.log` |
+| MySQL | `/var/log/mysql/error.log` |
+| fail2ban | `/var/log/fail2ban.log` |
+
+**macOS**
+| Log name | Path |
+|:---|:---|
+| System | `/var/log/system.log` |
+| Secure | `/var/log/secure.log` |
+
+Use `secux logscan --list-logs` to see which of these exist and are readable on the current machine.
+
+#### Targeting specific files
+
+```bash
+# Any supported log format — parser is auto-detected
+secux logscan --paths /path/to/file.log
+secux logscan --paths file1.log --paths file2.evtx --paths file3.json
+
+# Scan the bundled SSH dataset (works on any OS, no admin needed)
+secux logscan --paths datasets/OpenSSH_2k.log
+```
+
+---
+
 ### Output
+
+Scan results are automatically saved to the `output/` subdirectory (created on first run):
+
+```
+output/
+└── secux_logscan_20261116_191953.json   # one file per scan, timestamped
+```
+
+Use `--output <path>` to override the location, or `--append` to add new findings to an existing file.
 
 <p align="center">
   <img src="assets/audit_phases.png" alt="Audit Phases" width="700">
@@ -301,12 +368,26 @@ The rule-based `AnomalyDetector` covers:
 
 ## Datasets
 
-The `datasets/` folder contains the real public log data SecuX was built and evaluated against. All files are from open security research repositories.
+### What are the `datasets/` files for?
+
+The `datasets/` folder serves three purposes:
+
+| Purpose | Files | How to use |
+|:---|:---|:---|
+| **Quick demo / smoke test** | `OpenSSH_2k.log` | `secux logscan --paths datasets/OpenSSH_2k.log` — works on any OS, no admin needed, produces real findings |
+| **F1 / precision / recall benchmarking** | `secux_training_labeled.json`, `OpenSSH_2k.log_structured.csv` | `python scripts/evaluate.py datasets/secux_training_labeled.json` |
+| **Research / future training corpus** | UNSW-NB15 CSVs, OTRF JSON files | Reference material for extending detection rules or training ML models |
+
+> **These are not live system logs.** They are public research datasets used to test and benchmark the detection engine. SecuX does not send these files anywhere — they are read locally just like any log file you would scan with `--paths`.
+
+### Dataset inventory
+
+All files are from open security research repositories.
 
 | File | Source | Records | Type |
 |:---|:---|:---:|:---|
 | `OpenSSH_2k.log` | [LogPAI/loghub](https://github.com/logpai/loghub) | 2,000 | Linux syslog — real SSH brute force campaign |
-| `OpenSSH_2k.log_structured.csv` | [LogPAI/loghub](https://github.com/logpai/loghub) | 2,000 | Same data, pre-parsed with EventId labels |
+| `OpenSSH_2k.log_structured.csv` | [LogPAI/loghub](https://github.com/logpai/loghub) | 2,000 | Same data, pre-parsed with EventId labels (used as ground truth) |
 | `empire_mimikatz_logonpasswords_*.json` | [OTRF/Security-Datasets](https://github.com/OTRF/Security-Datasets) | 6,026 | Windows Sysmon + Security events — Mimikatz/Empire red-team |
 | `cmd_service_mod_fax_*.json` | [OTRF/Security-Datasets](https://github.com/OTRF/Security-Datasets) | 437 | Windows Sysmon + Security events — Fax service hijack via cmd.exe |
 | `UNSW-NB15_1–4.csv` | [UNSW-NB15](https://research.unsw.edu.au/projects/unsw-nb15-dataset) | 2,540,047 | Network flow records — 9 attack categories + normal traffic |
@@ -417,7 +498,7 @@ The `AutoDetectParser` selects the correct parser automatically. Order of preced
 | Terminal UI | Rich |
 | File monitoring | Watchdog |
 | Parallelism | `concurrent.futures.ThreadPoolExecutor` |
-| LLM (cloud) | OpenRouter API (Llama 3.3, Qwen, etc.) |
+| LLM (cloud) | OpenRouter API (default: `qwen/qwen3.7-flash`) |
 | LLM (cloud) | Google Gemini 1.5 Flash |
 | LLM (local) | Ollama (any model) |
 | Output | JSON reports |

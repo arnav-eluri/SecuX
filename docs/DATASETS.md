@@ -1,6 +1,61 @@
-# Labeled Datasets for SecuX Evaluation
+# SecuX Datasets & Data Collection
 
-This document lists public log datasets you can use with `scripts/evaluate.py` to get real F1/precision/recall numbers.
+## Where does SecuX get its data?
+
+SecuX reads from two sources: **live system data** collected at runtime, and **log files** you point it at (or that it auto-discovers).
+
+### Live data collected at runtime (`audit` mode)
+
+| Agent | Collection method | Data collected |
+|:---|:---|:---|
+| Network Monitoring | `netstat -ano` (Windows) | Active TCP/UDP connections, listening ports, associated PIDs |
+| Vulnerability Analysis | `tasklist` + `platform` module | Running process names, OS version, architecture |
+| Authentication Intelligence | Log scan results (filtered) | Auth-related anomalies extracted from the log parse phase |
+
+Nothing is sent to any external service. All collection happens locally via standard OS commands.
+
+### Log file auto-discovery
+
+When no `--paths` flag is given, SecuX looks for logs in standard system locations:
+
+**Windows** — `C:\Windows\System32\winevt\Logs\Security.evtx`, `System.evtx`, `Application.evtx`, `Setup.evtx`
+> Requires Administrator privileges or the `python-evtx` library (`pip install -e ".[evtx]"`).
+
+**Linux** — `/var/log/auth.log`, `/var/log/syslog`, `/var/log/secure`, `/var/log/messages`, Apache/MySQL/fail2ban logs
+
+**macOS** — `/var/log/system.log`, `/var/log/secure.log`
+
+Use `secux logscan --list-logs` to see which paths exist and are readable on the current machine.
+
+### Targeting specific files
+
+```bash
+secux logscan --paths /var/log/auth.log
+secux logscan --paths file1.log --paths file2.evtx --paths file3.json
+```
+
+Supported formats: Linux syslog (RFC3164), Windows `.evtx`, IIS W3C, newline-delimited JSON, plain-text. The parser is auto-detected.
+
+---
+
+## Bundled datasets in `datasets/`
+
+These are **public research datasets** used to test and benchmark the detection engine — not live system data. They are read locally like any log file and are never uploaded anywhere.
+
+| File | Purpose |
+|:---|:---|
+| `OpenSSH_2k.log` | Quick demo and smoke test — `secux logscan --paths datasets/OpenSSH_2k.log` |
+| `OpenSSH_2k.log_structured.csv` | Ground truth labels for F1 benchmarking |
+| `empire_mimikatz_*.json` | Windows red-team dataset for detection rule testing |
+| `cmd_service_mod_fax_*.json` | Windows service hijack dataset for detection rule testing |
+| `UNSW-NB15_*.csv` | Network flow research corpus (future ML training) |
+| `secux_training_labeled.json` | 48-entry hand-labeled eval harness — `python scripts/evaluate.py` |
+
+---
+
+## Public datasets for further evaluation
+
+This section lists public log datasets you can use with `scripts/evaluate.py` to get real F1/precision/recall numbers.
 
 ## Recommended (log format — directly parseable)
 

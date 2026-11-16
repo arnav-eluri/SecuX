@@ -16,14 +16,14 @@ class LLMEngine:
         
         # OpenRouter setup
         self.openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
-        self.openrouter_model = os.getenv("OPENROUTER_MODEL", "qwen/qwen3-7b:free")
+        self.openrouter_model = os.getenv("OPENROUTER_MODEL", "qwen/qwen3.7-flash")
 
         self.model_config = {
-            "super_agent":       "qwen/qwen3-7b:free",
-            "log_analysis":      "qwen/qwen3-7b:free",
-            "anomaly_detector":  "qwen/qwen3-7b:free",
-            "vuln_analysis":     "qwen/qwen3-7b:free",
-            "report_generator":  "qwen/qwen3-7b:free",
+            "super_agent":       "qwen/qwen3.7-flash",
+            "log_analysis":      "qwen/qwen3.7-flash",
+            "anomaly_detector":  "qwen/qwen3.7-flash",
+            "vuln_analysis":     "qwen/qwen3.7-flash",
+            "report_generator":  "qwen/qwen3.7-flash",
         }
         
         # Google setup (optional fallback)
